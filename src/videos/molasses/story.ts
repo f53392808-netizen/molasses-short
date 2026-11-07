@@ -110,11 +110,11 @@ const mix = (a: Cam, b: Cam, k: number): Cam => ({
   fov: a.fov + (b.fov - a.fov) * k, roll: a.roll + (b.roll - a.roll) * k,
 });
 // Wide framing (user, Nov 7 2026: too zoomed in): pull back 1.45x from the look point and widen the lens.
-const PULL = 1.45;
+const PULL = 1.3;
 const full = (c: Shot): Cam => {
   const fov0 = c.fov ?? 40;
   const pos = c.look.map((v, i) => v + (c.pos[i] - v) * PULL) as V3;
-  return { roll: 0, ...c, pos, fov: Math.min(62, Math.max(52, fov0 * 1.25)) };
+  return { roll: 0, ...c, pos, fov: Math.min(50, Math.max(40, fov0 * 1.05)) };
 };
 const run = (keys: Key[], f: number) => {
   let cur = full(keys[0].s(f));

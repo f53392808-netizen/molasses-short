@@ -97,7 +97,7 @@ const Inner: React.FC<{ id: number; kit: Kit }> = ({ id, kit }) => {
 const dprOverride = () => (getInputProps() as { post?: { dpr?: number } }).post?.dpr;
 const ShotView: React.FC<{ id: number; kit: Kit; alpha: number }> = ({ id, kit, alpha }) => (
   <AbsoluteFill style={{ opacity: alpha }}>
-    <ThreeCanvas width={1080} height={1920} {...(dprOverride() ? { dpr: dprOverride() } : {})} shadows gl={{ antialias: false, stencil: false, powerPreference: "high-performance", toneMappingExposure: 1.0 }}
+    <ThreeCanvas width={1920} height={1080} {...(dprOverride() ? { dpr: dprOverride() } : {})} shadows gl={{ antialias: false, stencil: false, powerPreference: "high-performance", toneMappingExposure: 1.0 }}
       camera={{ fov: 40, near: 0.2, far: 1500 }}>
       <Inner id={id} kit={kit} />
     </ThreeCanvas>
@@ -116,7 +116,7 @@ const TitleCard: React.FC<{ f: number; a: number; b: number; top: string; big: s
   const k = Math.min(1, (f - a) / 8, (b - f) / 8);
   const pop = 0.85 + 0.15 * Math.min(1, (f - a) / 6);
   return (
-    <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", paddingTop: 230, opacity: k }}>
+    <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", paddingTop: 110, opacity: k }}>
       <div style={{ transform: `scale(${pop}) rotate(-2deg)`, background: "#f4e6c8", border: "8px solid #351f22", borderRadius: 18, padding: "22px 44px", boxShadow: "12px 12px 0 #351f22", textAlign: "center", fontFamily: "Georgia, serif" }}>
         <div style={{ fontSize: 40, letterSpacing: 8, color: "#8a3b12", fontWeight: 700 }}>{top}</div>
         <div style={{ fontSize: 84, color: "#351f22", fontWeight: 900, lineHeight: 1.05 }}>{big}</div>

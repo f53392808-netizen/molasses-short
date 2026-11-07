@@ -1,8 +1,6 @@
 name: render
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 jobs:
   chunk:
     runs-on: ubuntu-latest

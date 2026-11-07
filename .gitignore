@@ -1,0 +1,4 @@
+node_modules/
+out/
+voice/voice_raw.wav
+*.zip

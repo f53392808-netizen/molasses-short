@@ -1,0 +1,40 @@
+name: render
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci || npm install
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: render part
+        run: |
+          N=1890; P=20; i=${{ matrix.part }}
+          S=$(( i*N/P )); E=$(( (i+1)*N/P - 1 ))
+          npx remotion render src/index.ts MolassesShort out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 18 --concurrency=4 --timeout=300000 --log=error
+      - uses: actions/upload-artifact@v4
+        with: { name: part-${{ matrix.part }}, path: out/*.mp4, retention-days: 3 }
+  join:
+    needs: chunk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - uses: actions/download-artifact@v4
+        with: { path: parts, merge-multiple: true }
+      - run: |
+          ls parts/*.mp4 | sort | sed "s/^/file '/; s/$/'/" > list.txt
+          ffmpeg -y -f concat -safe 0 -i list.txt -i audio/mix.wav -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart molasses_final.mp4
+          ffprobe -v error -show_entries format=duration -of csv=p=0 molasses_final.mp4
+      - uses: actions/upload-artifact@v4
+        with: { name: molasses_final, path: molasses_final.mp4, retention-days: 7 }

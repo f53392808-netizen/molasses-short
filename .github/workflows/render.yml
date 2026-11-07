@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
-      - run: npm ci || npm install
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: render part
         run: |
@@ -23,7 +23,10 @@ jobs:
           S=$(( i*N/P )); E=$(( (i+1)*N/P - 1 ))
           npx remotion render src/index.ts MolassesShort out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 18 --concurrency=4 --timeout=300000 --log=error
       - uses: actions/upload-artifact@v4
-        with: { name: part-${{ matrix.part }}, path: out/*.mp4, retention-days: 3 }
+        with:
+          name: part-${{ matrix.part }}
+          path: out/*.mp4
+          retention-days: 3
   join:
     needs: chunk
     runs-on: ubuntu-latest

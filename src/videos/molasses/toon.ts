@@ -255,8 +255,8 @@ const lidOf = (b: boolean | number | undefined) => (b === true ? 1 : Number(b) |
 const eye = (p: Pen, kind: EyeK, x: number, ey: number, u: number, side: number, look: number, skin: string) => {
   const lx = x + look * 3 * u, lw = 3.8 * u;
   switch (kind) {
-    case "dot": p.ell(lx, ey, 3.8 * u, 5.5 * u, INK, 0); break;
-    case "small": p.ell(lx, ey, 3 * u, 4.4 * u, INK, 0); break;
+    case "dot": p.ell(x, ey, 7 * u, 8.5 * u, "#fbf7ee", 1.8 * u); p.ell(lx + side * 0.3 * u, ey + 0.8 * u, 4.4 * u, 5.8 * u, "#3a2416", 0); p.ell(lx + side * 0.3 * u, ey + 1.2 * u, 2.4 * u, 3.2 * u, INK, 0); p.ell(lx - 1.6 * u, ey - 1.6 * u, 1.5 * u, 1.5 * u, "#ffffff", 0); break;
+    case "small": p.ell(x, ey, 6 * u, 7 * u, "#fbf7ee", 1.8 * u); p.ell(lx, ey + 0.6 * u, 3 * u, 4 * u, INK, 0); p.ell(lx - 1.2 * u, ey - 1.2 * u, 1.1 * u, 1.1 * u, "#ffffff", 0); break;
     case "lid": p.ell(lx, ey - u, 7 * u, 6 * u, INK, 0, 0, 180); p.stroke([[x - 9 * u, ey - u], [x + 9 * u, ey - u]], lw); break;
     case "slit": p.ell(lx, ey, 7 * u, 2.6 * u, INK, 0, 0, 180); p.stroke([[x - 9 * u, ey], [x + 9 * u, ey]], lw); break;
     case "happy": p.arc(x, ey + 3 * u, 8 * u, 6 * u, 200, 340, lw); break;
@@ -317,6 +317,8 @@ const faceFront = (p: Pen, cx: number, cy: number, W: number, expr: Expr, facing
     if (kind === "shock" || kind === "shockHalf") p.arc(x, by - 6 * u, 9 * u, 3 * u, 200, 340, 4 * u);
     else taper(p, [x - side * 8.5 * u, by + dI * u], [x + side * 8.5 * u, by + dO * u], 5 * u, 2.5 * u);
   }
+  for (const side of [-1, 1]) p.ell(fx + side * (ex + 5 * u), ey + 11 * u, 6 * u, 3.2 * u, "#f29a8a", 0);
+  p.arc(fx + 2 * u * facing, ey + 9 * u, 3 * u, 2.4 * u, 20, 160, 1.8 * u);
   const mx = cx + 8 * u * facing, my = cy + 20 * u;
   mouth(p, F.mouth, mx, my, u);
   if (moustache) for (const s of [-1, 1])
@@ -622,6 +624,11 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
   p.inkRing(hp, ow, thick);
   hatOn(p, o, hp, H, 300, hc, light, seed, facing, false);
   const brim = !!o.hat && o.hat !== "hair" && o.hat !== "bonnet" && o.hat !== "cap";
+  if (o.hat === "hair" || o.hat === "cap") { // signature hair curl on every character
+    const cy0 = hc - H.b, c = o.hat === "hair" ? (o.hair ?? "#3a2a20") : (o.cap ?? INK);
+    p.stroke([[300 + 4 * u, cy0 + 3 * u], [300 + 6 * u, cy0 - 7 * u], [300 + 13 * u, cy0 - 11 * u], [300 + 17 * u, cy0 - 6 * u], [300 + 12 * u, cy0 - 2 * u]], 3.2 * u, INK);
+    p.stroke([[300 + 4 * u, cy0 + 3 * u], [300 + 6 * u, cy0 - 7 * u], [300 + 13 * u, cy0 - 11 * u], [300 + 17 * u, cy0 - 6 * u], [300 + 12 * u, cy0 - 2 * u]], 1.6 * u, c);
+  }
   faceFront(p, 300, hc, W, expr, facing, look, lid, brim, skin, o.moustache, o.build === "stout");
   p.rot = null;
 };
@@ -928,4 +935,14 @@ export const fxBlob = (p: Pen, col: string) => {
   const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
   for (const [r, k] of [[0, 0], [0.5, 0.04], [0.64, 0.18], [0.76, 0.42], [0.87, 0.72], [0.95, 0.92], [1, 1]] as const) gr.addColorStop(r, mix(col, WHITE, k));
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+};
+
+/** reusable cast presets for any niche (history, finance, science...): same body system, different wardrobe */
+export const PRESETS: Record<string, Outfit> = {
+  financeSuit: { jacket: "#2c3a55", pants: "#2c3a55", boots: "#1e1a18", hat: "hair", hair: "#2a201a", buttons: "#c9ccd2" },
+  banker1920: { jacket: "#3a3438", pants: "#3a3438", boots: "#1e1a18", hat: "hair", hair: "#6a6a6a", moustache: "#5a5a5a", build: "stout" },
+  officeCasual: { jacket: "#5f7fa8", pants: "#4a4038", boots: "#4a3426", hat: "hair", hair: "#5a3b2a" },
+  worker1900: { jacket: "#7a5a3a", pants: "#3b3f52", boots: "#2f2420", hat: "cap", cap: "#3a3f4a" },
+  scientist: { jacket: "#e8e6e0", pants: "#3b3f52", boots: "#2f2420", hat: "hair", hair: "#8a8a8a" },
+  soldier: { jacket: "#4f5d3a", pants: "#4f5d3a", boots: "#2f2420", hat: "cap", cap: "#4f5d3a", belt: "#6e4a30" },
 };

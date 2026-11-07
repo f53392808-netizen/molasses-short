@@ -104,15 +104,38 @@ const ShotView: React.FC<{ id: number; kit: Kit; alpha: number }> = ({ id, kit, 
   </AbsoluteFill>
 );
 
+// Bold title cards on the key beats (facts: boston.gov, NBC; see SCRIPT.md)
+const CARDS = [
+  { a: 150, b: 270, top: "BOSTON", big: "15 JAN 1919" },
+  { a: 330, b: 440, top: "ONE STEEL TANK", big: "2.3 MILLION GALLONS" },
+  { a: 840, b: 960, top: "A WAVE 25 FT HIGH", big: "35 MPH" },
+  { a: 1420, b: 1488, top: "THE TOLL", big: "21 DEAD · 150 HURT" },
+];
+const TitleCard: React.FC<{ f: number; a: number; b: number; top: string; big: string }> = ({ f, a, b, top, big }) => {
+  if (f < a || f >= b) return null;
+  const k = Math.min(1, (f - a) / 8, (b - f) / 8);
+  const pop = 0.85 + 0.15 * Math.min(1, (f - a) / 6);
+  return (
+    <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", paddingTop: 230, opacity: k }}>
+      <div style={{ transform: `scale(${pop}) rotate(-2deg)`, background: "#f4e6c8", border: "8px solid #351f22", borderRadius: 18, padding: "22px 44px", boxShadow: "12px 12px 0 #351f22", textAlign: "center", fontFamily: "Georgia, serif" }}>
+        <div style={{ fontSize: 40, letterSpacing: 8, color: "#8a3b12", fontWeight: 700 }}>{top}</div>
+        <div style={{ fontSize: 84, color: "#351f22", fontWeight: 900, lineHeight: 1.05 }}>{big}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 export const MolassesShort: React.FC = () => {
   const f = useCurrentFrame();
   const kit = useKit();
   if (!kit) return null;
   const flash = f >= FLASH_AT && f < FLASH_AT + 4 ? [1, 0.75, 0.45, 0.2][f - FLASH_AT] : 0;
   return (
-    <AbsoluteFill style={{ background: "#cfe3f2" }}>
+    <AbsoluteFill style={{ background: "#cfe3f2", filter: "sepia(0.22) saturate(1.12) contrast(1.06)" }}>
       {layersAt(f).map((l, i) => <ShotView key={i ? "over" : "base"} id={l.id} kit={kit} alpha={l.alpha} />)}
       {flash > 0 && <AbsoluteFill style={{ background: "#ffffff", opacity: flash }} />}
+      <AbsoluteFill style={{ pointerEvents: "none", background: "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(40,20,5,0.45) 100%)", mixBlendMode: "multiply" }} />
+      {CARDS.map((c, i) => <TitleCard key={i} f={f} {...c} />)}
     </AbsoluteFill>
   );
 };

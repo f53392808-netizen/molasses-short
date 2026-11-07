@@ -109,7 +109,13 @@ const mix = (a: Cam, b: Cam, k: number): Cam => ({
   pos: a.pos.map((v, i) => v + (b.pos[i] - v) * k) as V3, look: a.look.map((v, i) => v + (b.look[i] - v) * k) as V3,
   fov: a.fov + (b.fov - a.fov) * k, roll: a.roll + (b.roll - a.roll) * k,
 });
-const full = (c: Shot): Cam => ({ fov: 40, roll: 0, ...c });
+// Wide framing (user, Nov 7 2026: too zoomed in): pull back 1.45x from the look point and widen the lens.
+const PULL = 1.45;
+const full = (c: Shot): Cam => {
+  const fov0 = c.fov ?? 40;
+  const pos = c.look.map((v, i) => v + (c.pos[i] - v) * PULL) as V3;
+  return { roll: 0, ...c, pos, fov: Math.min(62, Math.max(52, fov0 * 1.25)) };
+};
 const run = (keys: Key[], f: number) => {
   let cur = full(keys[0].s(f));
   for (let i = 1; i < keys.length; i++) {
@@ -122,8 +128,8 @@ const run = (keys: Key[], f: number) => {
 const T = (f: number) => f / FPS;
 const pushK = (f: number, f0: number, rate: number, punch = 0, n = 35) => {
   const x = Math.max(0, f - f0);
-  let s = rate * x;
-  if (punch > rate) for (let i = 0; i < Math.min(x, n); i++) s += (punch - rate) * Math.max(0, Math.min(1, (i + 0.5) / 8, (n - i - 0.5) / 8));
+  let s = rate * 0.5 * x;
+  if (false && punch > rate) for (let i = 0; i < Math.min(x, n); i++) s += (punch - rate) * Math.max(0, Math.min(1, (i + 0.5) / 8, (n - i - 0.5) / 8));
   return Math.exp(-s);
 };
 const dolly = (pos: V3, look: V3, k: number, rest: Partial<Cam> = {}): Shot =>

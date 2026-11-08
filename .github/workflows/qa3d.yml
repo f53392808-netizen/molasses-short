@@ -28,4 +28,7 @@ jobs:
           for f,n in zip(fs,L): os.rename('out/'+f,'out/f%05d.jpeg'%int(n))
           "
       - uses: actions/upload-artifact@v4
-        with: { name: qa-${{ matrix.part }}, path: out/*.jpeg, retention-days: 2 }
+        with:
+          name: qa-${{ matrix.part }}
+          path: out/*.jpeg
+          retention-days: 2

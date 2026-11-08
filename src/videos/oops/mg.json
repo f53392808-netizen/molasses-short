@@ -1,0 +1,217 @@
+[
+{
+"id": "d_2025a",
+"from": 0.0,
+"dur": 2.6
+},
+{
+"id": "loc_jax",
+"from": 13.2,
+"dur": 2.15
+},
+{
+"id": "c_open",
+"from": 18.9,
+"dur": 3.6
+},
+{
+"id": "t_logo",
+"from": 36.0,
+"dur": 4.6
+},
+{
+"id": "d_2010",
+"from": 41.45,
+"dur": 2.7
+},
+{
+"id": "l_laszlo",
+"from": 64.6,
+"dur": 5.8
+},
+{
+"id": "s_pct",
+"from": 124.7,
+"dur": 5.0
+},
+{
+"id": "d_0518",
+"from": 156.83,
+"dur": 4.3
+},
+{
+"id": "q_post",
+"from": 161.3,
+"dur": 6.6
+},
+{
+"id": "q_fish",
+"from": 175.3,
+"dur": 3.0
+},
+{
+"id": "s_days",
+"from": 188.4,
+"dur": 3.05
+},
+{
+"id": "l_jeremy",
+"from": 203.5,
+"dur": 6.6
+},
+{
+"id": "s_price",
+"from": 211.0,
+"dur": 7.25
+},
+{
+"id": "m_map",
+"from": 224.0,
+"dur": 3.55
+},
+{
+"id": "d_0522",
+"from": 237.0,
+"dur": 2.7
+},
+{
+"id": "s_41",
+"from": 240.0,
+"dur": 4.85
+},
+{
+"id": "q_report",
+"from": 276.3,
+"dur": 5.6
+},
+{
+"id": "s_2pizzas",
+"from": 288.3,
+"dur": 3.4
+},
+{
+"id": "p_poll",
+"from": 301.4,
+"dur": 6.05
+},
+{
+"id": "s_80k",
+"from": 325.3,
+"dur": 6.0
+},
+{
+"id": "k_price_0",
+"from": 338.7,
+"dur": 8.0
+},
+{
+"id": "k_price_1",
+"from": 346.7,
+"dur": 8.0
+},
+{
+"id": "k_price_2",
+"from": 354.7,
+"dur": 8.0
+},
+{
+"id": "k_price_3",
+"from": 362.7,
+"dur": 8.0
+},
+{
+"id": "k_price_4",
+"from": 370.7,
+"dur": 8.0
+},
+{
+"id": "k_price_5",
+"from": 378.7,
+"dur": 8.0
+},
+{
+"id": "k_price_6",
+"from": 386.7,
+"dur": 6.5
+},
+{
+"id": "k_chart_0",
+"from": 404.3,
+"dur": 8.0
+},
+{
+"id": "k_chart_1",
+"from": 412.3,
+"dur": 8.0
+},
+{
+"id": "k_chart_2",
+"from": 420.3,
+"dur": 8.0
+},
+{
+"id": "k_chart_3",
+"from": 428.3,
+"dur": 8.0
+},
+{
+"id": "k_chart_4",
+"from": 436.3,
+"dur": 0.7
+},
+{
+"id": "c_hind",
+"from": 465.2,
+"dur": 8.0
+},
+{
+"id": "q_good",
+"from": 483.3,
+"dur": 2.85
+},
+{
+"id": "d_pizzaday",
+"from": 552.6,
+"dur": 4.4
+},
+{
+"id": "d_hof",
+"from": 561.49,
+"dur": 9.1
+},
+{
+"id": "q_future",
+"from": 574.8,
+"dur": 3.5
+},
+{
+"id": "l_disc1",
+"from": 579.0,
+"dur": 5.4
+},
+{
+"id": "d_2018",
+"from": 615.67,
+"dur": 8.4
+},
+{
+"id": "s_hundredth",
+"from": 625.6,
+"dur": 2.6
+},
+{
+"id": "c_next",
+"from": 639.6,
+"dur": 3.8
+},
+{
+"id": "c_end",
+"from": 643.7,
+"dur": 5.2
+},
+{
+"id": "l_disc2",
+"from": 649.3,
+"dur": 4.28
+}
+]

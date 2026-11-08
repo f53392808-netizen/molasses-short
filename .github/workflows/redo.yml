@@ -23,9 +23,9 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: render part
         run: |
-          N=1890; P=20; i=${{ matrix.part }}
+          N=19608; P=20; i=${{ matrix.part }}
           S=$(( i*N/P )); E=$(( (i+1)*N/P - 1 ))
-          npx remotion render src/index.ts MolassesShort out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 18 --concurrency=4 --timeout=300000 --log=error
+          npx remotion render src/index.ts OopsEp01 out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 16 --pixel-format=yuv420p --x264-preset=medium --concurrency=4 --timeout=300000 --log=error
       - uses: actions/upload-artifact@v4
         with:
           name: part-${{ matrix.part }}
@@ -53,10 +53,10 @@ jobs:
           ls parts
           [ $(ls parts/*.mp4 | wc -l) -eq 20 ] || { echo "missing parts"; exit 1; }
           ls parts/*.mp4 | sort | sed "s/^/file '/; s/$/'/" > list.txt
-          ffmpeg -y -f concat -safe 0 -i list.txt -i audio/mix.wav -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart molasses_final.mp4
-          ffprobe -v error -show_entries format=duration -of csv=p=0 molasses_final.mp4
+          ffmpeg -y -f concat -safe 0 -i list.txt -c copy -movflags +faststart oops_ep01_video.mp4
+          ffprobe -v error -show_entries format=duration -of csv=p=0 oops_ep01_video.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: molasses_final
-          path: molasses_final.mp4
+          name: oops_ep01_video
+          path: oops_ep01_video.mp4
           retention-days: 7

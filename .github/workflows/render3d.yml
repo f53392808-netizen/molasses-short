@@ -3,28 +3,41 @@ on:
   workflow_dispatch:
     inputs:
       comp: { description: 'composition id', default: 'OopsEp01-3D' }
-      frames: { description: 'total frames', default: '1746' }
+      frames: { description: 'total frames', default: '19607' }
+      crf: { description: 'crf', default: '10' }
+      parts: { description: 'only these parts (comma list) or all', default: 'all' }
 jobs:
   chunk:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
-        part: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+        part: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
     steps:
+      - name: skip?
+        id: sk
+        run: |
+          P='${{ inputs.parts }}'; if [ "$P" = all ] || echo ",$P," | grep -q ",${{ matrix.part }},"; then echo run=1 >> $GITHUB_OUTPUT; else echo run=0 >> $GITHUB_OUTPUT; fi
       - uses: actions/checkout@v4
+        if: steps.sk.outputs.run == '1'
       - uses: actions/setup-node@v4
+        if: steps.sk.outputs.run == '1'
         with: { node-version: 20 }
       - run: npm install --no-audit --no-fund
+        if: steps.sk.outputs.run == '1'
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        if: steps.sk.outputs.run == '1'
       - name: render part
+        if: steps.sk.outputs.run == '1'
         run: |
-          N=${{ inputs.frames }}; P=20; i=${{ matrix.part }}
+          N=${{ inputs.frames }}; P=40; i=${{ matrix.part }}
           S=$(( i*N/P )); E=$(( (i+1)*N/P - 1 ))
-          npx remotion render src/index.ts ${{ inputs.comp }} out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 16 --pixel-format=yuv420p --x264-preset=medium --concurrency=2 --timeout=300000 --log=error
+          npx remotion render src/index.ts ${{ inputs.comp }} out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf ${{ inputs.crf }} --pixel-format=yuv420p --x264-preset=medium --concurrency=2 --timeout=300000 --log=error
       - uses: actions/upload-artifact@v4
+        if: steps.sk.outputs.run == '1'
         with:
+          compression-level: 0
           name: p3d-${{ matrix.part }}
           path: out/*.mp4
           retention-days: 3
@@ -36,9 +49,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { path: parts, merge-multiple: true, pattern: 'p3d-*' }
       - run: |
-          [ $(ls parts/*.mp4 | wc -l) -eq 20 ] || { echo "missing parts"; exit 1; }
+          [ $(ls parts/*.mp4 | wc -l) -eq 40 ] || { echo "missing parts"; exit 1; }
           ls parts/*.mp4 | sort | sed "s/^/file '/; s/$/'/" > list.txt
           ffmpeg -y -f concat -safe 0 -i list.txt -c copy -movflags +faststart oops3d_video.mp4
           ffprobe -v error -show_entries stream=width,height,nb_frames:format=duration -of csv=p=0 oops3d_video.mp4
       - uses: actions/upload-artifact@v4
-        with: { name: oops3d_video, path: oops3d_video.mp4, retention-days: 7 }
+        with: { name: oops3d_video, path: oops3d_video.mp4, retention-days: 7, compression-level: 0 }

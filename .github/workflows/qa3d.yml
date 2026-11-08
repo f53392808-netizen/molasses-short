@@ -1,0 +1,31 @@
+name: qa3d
+on:
+  workflow_dispatch:
+    inputs:
+      parts: { description: 'jobs', default: '20' }
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - name: stills
+        run: |
+          L=$(python3 -c "f=open('qa_frames.txt').read().split(','); i=${{ matrix.part }}; n=len(f); print(','.join(f[i*n//20:(i+1)*n//20]))")
+          N=$(python3 -c "print(len('$L'.split(','))-1)")
+          node scripts/oops3d_frames.mjs out 0.5 0 $N 1 $L
+          python3 -c "
+          import os
+          L='$L'.split(',')
+          fs=sorted(os.listdir('out'))
+          for f,n in zip(fs,L): os.rename('out/'+f,'out/f%05d.jpeg'%int(n))
+          "
+      - uses: actions/upload-artifact@v4
+        with: { name: qa-${{ matrix.part }}, path: out/*.jpeg, retention-days: 2 }

@@ -454,6 +454,8 @@ export type FrontOpts = {
   light?: number; facing?: -1 | 0 | 1; seed?: number;
   /** optional extras (all default off) */
   noArms?: boolean; talk?: number; curl?: number; tieSwing?: number;
+  /** back view (optional): no face, no shirt-front details, hair/cap covers the head */
+  back?: boolean;
   /** custom arms drawn inside the upper-body transform: behind the torso / in front of it (before the head) */
   armsBehind?: (p: Pen, G: FrontGeom) => void; armsFront?: (p: Pen, G: FrontGeom) => void;
   /** drawn inside the head transform after the face (glasses, beard) */
@@ -586,6 +588,7 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
         p.poly([[xc - 3.5 * u, yc - 3.5 * u], [xc + 3.5 * u, yc - 3.5 * u], [xc + 3.5 * u, yc + 3.5 * u], [xc - 3.5 * u, yc + 3.5 * u]], "#d9dde0", 1.5 * u);
       }
       if (o.sash) p.band([[tcx - 1.3 * T.a, torsoBot - 0.32 * HH], [tcx + 1.3 * T.a, torsoBot - 0.32 * HH]], o.sash, 0.13 * HH, 1.8 * u);
+      if (opts.back) { p.stroke([[tcx, chin + 0.05 * HH], [tcx, torsoBot - 0.05 * HH]], 1.2 * u, "rgba(36,23,38,0.35)"); return; }
       const top = o.top ?? "suit";
       if (top === "tee" || top === "hoodie") {
         p.arc(tcx + 2 * u * facing, chin - 0.02 * HH, 0.36 * T.a, 0.1 * HH, 10, 170, 2.2 * u);
@@ -660,6 +663,15 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
   const hp = blobPts(300, hc, H);
   p.shadedFill(hp, skin, mul(skin, SH_SKIN), light, H.a);
   p.inkRing(hp, ow, thick);
+  if (opts.back) { // back of the head: hair (or cap + hair) over the whole blob, ink ring on top
+    const hairC = o.hat === "hair" ? (o.hair ?? "#3a2a20") : "#3a2a20", capC = o.hat === "cap" ? (o.cap ?? INK) : null;
+    p.clip(hp, () => {
+      p.poly([[300 - 2 * H.a, hc - 2 * H.b], [300 + 2 * H.a, hc - 2 * H.b], [300 + 2 * H.a, hc + 0.55 * H.b], [300 - 2 * H.a, hc + 0.55 * H.b]], hairC, 0);
+      if (capC) p.poly([[300 - 2 * H.a, hc - 2 * H.b], [300 + 2 * H.a, hc - 2 * H.b], [300 + 2 * H.a, hc - 0.05 * H.b], [300 - 2 * H.a, hc - 0.05 * H.b]], capC, 0);
+    });
+    p.inkRing(hp, ow, thick);
+    p.rot = null; return G;
+  }
   hatOn(p, o, hp, H, 300, hc, light, seed, facing, false);
   const brim = !!o.hat && o.hat !== "hair" && o.hat !== "bonnet" && o.hat !== "cap";
   if (o.hat === "hair" || o.hat === "cap") { // signature hair curl on every character

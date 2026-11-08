@@ -176,7 +176,7 @@ export const cast = (t: number): Who[] => {
       st = act(t, [[0, { mode: "sit", expr: "neutral", facing: 1 }], [50.9, { expr: "grin" }], [52.56, { expr: "flat", facing: 0 }], [54.5, { facing: 1, expr: "neutral" }]]);
       if (t < 50.8 || t > 54.5) st = typing(st, t);
     }
-    out.push({ c: LASZLO, pos: [76.85, HOUSE.floor + 0.4, -20.1], st, blob: false });
+    if (s !== "forum") out.push({ c: LASZLO, pos: [76.85, HOUSE.floor + 0.4, -20.1], st, blob: false }); // forum = screen insert, he is off-frame there
     if (s === "dinner") out.push(buck(t, 75.4, -18.4, [[28.9, { facing: 1, expr: "neutral" }], [31.9, { R: "point", expr: "flat" }], [34.5, { R: "down" }]]));
     if (s === "game" || s === "forum") out.push(buck(t, 80.35, -18.15, [[48, { facing: -1, expr: "neutral" }], [49.1, { L: "pointUp", expr: "flat" }], [50.6, { L: "down" }],
       [52.56, { L: "shrug", R: "shrug", expr: "flat", facing: 0 }], [53.9, { L: "point", R: "down", facing: -1, expr: "neutral" }]]));

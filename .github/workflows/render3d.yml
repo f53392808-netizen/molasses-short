@@ -1,0 +1,44 @@
+name: render3d
+on:
+  workflow_dispatch:
+    inputs:
+      comp: { description: 'composition id', default: 'OopsEp01-3D' }
+      frames: { description: 'total frames', default: '1746' }
+jobs:
+  chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: render part
+        run: |
+          N=${{ inputs.frames }}; P=20; i=${{ matrix.part }}
+          S=$(( i*N/P )); E=$(( (i+1)*N/P - 1 ))
+          npx remotion render src/index.ts ${{ inputs.comp }} out/p_$(printf %02d $i).mp4 --gl=swangle --frames=$S-$E --crf 16 --pixel-format=yuv420p --x264-preset=medium --concurrency=2 --timeout=300000 --log=error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3d-${{ matrix.part }}
+          path: out/*.mp4
+          retention-days: 3
+  join:
+    needs: chunk
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - uses: actions/download-artifact@v4
+        with: { path: parts, merge-multiple: true, pattern: 'p3d-*' }
+      - run: |
+          [ $(ls parts/*.mp4 | wc -l) -eq 20 ] || { echo "missing parts"; exit 1; }
+          ls parts/*.mp4 | sort | sed "s/^/file '/; s/$/'/" > list.txt
+          ffmpeg -y -f concat -safe 0 -i list.txt -c copy -movflags +faststart oops3d_video.mp4
+          ffprobe -v error -show_entries stream=width,height,nb_frames:format=duration -of csv=p=0 oops3d_video.mp4
+      - uses: actions/upload-artifact@v4
+        with: { name: oops3d_video, path: oops3d_video.mp4, retention-days: 7 }
